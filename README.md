@@ -259,7 +259,7 @@ FROM customer_orders;
 |------------|--------------|------------|
 | NULL       | 4            | 5          |
 
-!It means, there are no real NULLs in in exclusions column, empty values are string '', but there are fake nulls (strings)!
+It means, there are no real NULLs in in exclusions column, empty values are string '', but there are fake nulls (strings)
 
 ```sql
 SELECT
@@ -273,7 +273,7 @@ FROM customer_orders;
 |------------|--------------|------------|
 | 1          | 6            | 3          |
 
-!There is 1 real NULL in in extras column, empty values are string '', but there are fake nulls (strings)!
+There is 1 real NULL in in extras column, empty values are string '', but there are fake nulls (strings)
 
 ### 4. Detect non-numeric characters
 
