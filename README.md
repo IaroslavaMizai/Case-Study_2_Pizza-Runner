@@ -187,9 +187,7 @@ Algorithm:
 6. Identify multi-value formats
 7. Validate numeric ranges
 
-### 1. Inspect distinct values
-
-Goal: detect unexpected patterns, inconsistent formats, typos, or "fake" values.
+### 1. Inspect distinct values. Detect unexpected patterns, inconsistent formats, typos, or "fake" values.
 
 ``` sql
 SELECT DISTINCT exclusions FROM customer_orders;
@@ -216,10 +214,8 @@ SELECT DISTINCT extras FROM customer_orders;
 
 
 
-### 2. Count frequency of each value
-Understanding how often each anomaly appears helps prioritize cleanup.
+### 2. Count frequency of each value. Understanding how often each anomaly appears helps prioritize cleanup.
 
-Goal: 
 ``` sql
 SELECT exclusions, COUNT(*) 
 FROM customer_orders
@@ -251,12 +247,6 @@ ORDER BY COUNT(*) DESC;
 
 
 ### 3. Check for NULL vs non-NULL inconsistencies
-Why?
-Because text datasets often include:
-actual SQL NULL
-empty strings
-the literal string 'null'
-variations like 'NULL', 'Null', 'n u l l'
 
 ```sql
 SELECT
@@ -276,6 +266,7 @@ SELECT
     SUM(CASE WHEN extras IS NULL THEN 1 END) AS null_count,
     SUM(CASE WHEN extras = '' THEN 1 END) AS empty_string,
     SUM(CASE WHEN extras ILIKE '%null%' THEN 1 END) AS fake_nulls
+
 FROM customer_orders;
 ```
 | null_count | empty_string | fake_nulls |
@@ -285,13 +276,6 @@ FROM customer_orders;
 !There is 1 real NULL in in extras column, empty values are string '', but there are fake nulls (strings)!
 
 ### 4. Detect non-numeric characters
-Why?
-Because text datasets often include:
-alphabetic characters
-unexpected symbols
-invalid separators
-emojis (yes, it happens)
-broken CSV formats
 
 These columns should contain ingredient IDs — numeric lists.
 So check if the dataset contains anything else:
@@ -329,6 +313,7 @@ There are only strings 'null'-s (fake nulls) in extras column
 ### 5. Detect inconsistent separators and spacing
 
 These patterns indicate formatting that must be normalized before parsing.
+
 ```sql
 SELECT exclusions
 FROM customer_orders
@@ -384,6 +369,7 @@ SELECT
     COUNT(*)
 FROM customer_orders
 GROUP BY format_type;
+
 ```
 | format_type | count |
 | ----------- | ----- |
@@ -392,7 +378,6 @@ GROUP BY format_type;
 
 
 ### 7. Validate numeric ranges
-
 
 ```sql
 --Check exclusions
@@ -414,6 +399,7 @@ WHERE ingredient_text <> 'null'     -- ignore text 'null'
   AND (ingredient_text::INT < 1 OR ingredient_text::INT > 12)
 ORDER BY ingredient;
 ```
+
 After cleaning and parsing the values in the exclusions column, all numeric ingredients fall within the valid range of 1 to 12. There are no invalid or out-of-range numeric values in the exclusions data, meaning this column contains consistent and valid ingredient IDs or acceptable null/empty values.
 
 ```sql
@@ -435,6 +421,7 @@ WHERE ingredient_text <> 'null'
   AND ingredient_text <> ''         
   AND (ingredient_text::INT < 1 OR ingredient_text::INT > 12)
 ORDER BY ingredient;
+
 ```
 Similarly, after applying the same cleaning and validation process to the extras column, all numeric values are also within the valid range of 1 to 12.
 No anomalies or invalid ingredient IDs were detected in the extras column.
